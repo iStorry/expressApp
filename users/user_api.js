@@ -1,17 +1,15 @@
-const express = require('express');
-const utils = require('./Utils');
-const models = require('./stock_models')
+const router = require('express').Router();
+const utils = require('../common/utils');
+const models = require('./user_models')
+
 const bp = require('body-parser')
+router.use(bp.json());
 
-var userRouter = express.Router();
-
-userRouter.use(bp.json());
-
-userRouter.get("/", (req, res) => {
+router.get("/", (req, res) => {
     res.send("works!");
 })
 
-userRouter.post("/addUser", (req, res) => {
+router.post("/addUser", (req, res) => {
     var email = req.body.email;
 
     if(utils.validateEmail(email)) {
@@ -50,7 +48,7 @@ userRouter.post("/addUser", (req, res) => {
     }
 })
 
-userRouter.post("/changePassword", (req, res) => {
+router.post("/changePassword", (req, res) => {
     var email = req.body.email;
     var oldPass = req.body.oldPassword;
     var newPass = req.body.newPassword;
@@ -120,5 +118,5 @@ userRouter.post("/changePassword", (req, res) => {
 })
 
 module.exports = {
-    userRouter
+    router
 }

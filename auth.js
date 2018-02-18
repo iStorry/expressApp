@@ -1,5 +1,5 @@
 const express = require('express');
-const utils = require('./Utils');
+const utils = require('./common/utils');
 const models = require('./stock_models');
 const bp = require('body-parser');
 const passport = require('passport');

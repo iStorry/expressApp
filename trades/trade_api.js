@@ -1,20 +1,7 @@
-const express = require('express');
-var folioRouter = express.Router();
-const models = require('./stock_models')
+const router = require('express').Router();
+const models = require('./trade_models');
 
-folioRouter.get("/", passport.Authenticate('local', {session: false}), (req, res) => {
-    res.send("get")
-})
-
-folioRouter.get("/holdings", passport.Authenticate('local', {session: false}), (req, res) => {
-    res.send("get holdings")
-})
-
-folioRouter.get("/returns", passport.Authenticate('local', {session: false}), (req, res) => {
-    res.send("get returns");
-})
-
-folioRouter.post("/addTrade", passport.Authenticate('local', {session: false}), (req, res) => {
+router.post("/addTrade", (req, res) => {
     portfolio = req.body.Portfolio;
     userUUC = req.body.userUUC;
     var portfolioId = null;
@@ -52,14 +39,14 @@ folioRouter.post("/addTrade", passport.Authenticate('local', {session: false}), 
     })
 })
 
-folioRouter.post("/updateTrade", passport.Authenticate('local', {session: false}), (req, res) => {
+router.post("/updateTrade", (req, res) => {
     res.send("update trade");
 })
 
-folioRouter.post("/removeTrade", passport.Authenticate('local', {session: false}), (req, res) => {
+router.post("/removeTrade", (req, res) => {
     res.send("remove trade");
 })
 
 module.exports = {
-    folioRouter
+    router
 }
