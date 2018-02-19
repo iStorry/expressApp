@@ -2,7 +2,7 @@ module.exports = function (app, passport, LocalStrategy) {
 
     const bp = require('body-parser');
     const session = require("express-session");
-    const models = require("./users/user_models");
+    const userModel = require("./users/user_models").UserModel;
     const utils = require("./common/utils");
 
     app.use(bp.urlencoded({ extended: true }));
@@ -16,7 +16,7 @@ module.exports = function (app, passport, LocalStrategy) {
     
     passport.use('local-login', new LocalStrategy(
         function (username, password, done) {
-            models.UserModel.findOne({ UUC: username }, function (err, user) {
+            userModel.findOne({ UUC: username }, function (err, user) {
                 if (err) { return done(err); }
                 if (!user) {
                     return done(null, false, { message: 'Incorrect username.' });
@@ -34,7 +34,7 @@ module.exports = function (app, passport, LocalStrategy) {
     });
 
     passport.deserializeUser(function (id, done) {
-        models.UserModel.findById(id, function (err, user) {
+        userModel.findById(id, function (err, user) {
             done(err, user);
         });
     });

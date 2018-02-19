@@ -4,48 +4,87 @@ const stockModel = require("../stocks/stock_models").StockModel;
 const utils = require("../common/utils")
 
 router.get("/", utils.isLoggedIn, (req, res) => {
-    var ret = {}
-    tradeModel.find({Portfolio : req.user.UUC }, (err, result) => {
-        if(err) {
+    var ret = [];
+    tradeModel.find({ Portfolio: req.user.UUC }, (err, result) => {
+        if (err) {
             res.send({
-                "Error" : "Unable to get the trades"
+                "Error": "Unable to get the trades"
             })
             return next();
         }
-        if(!result) {
+        if (!result) {
             res.send({
-                "Error" : "No trades found"
+                "Error": "No trades found"
             })
             return next();
         }
 
-        for(var trade in result) {
-            if(ret.hasOwnProperty(trade.Stock)) {
-                ret[trade.Stock].push({ "Price": trade.Price, "Type" : trade.Type })
-            } else {
-                ret[trade.Stock] = [{ "Price": trade.Price, "Type" : trade.Type }]
+        for (var i = 0; i < result.length; i++) {
+            var trade = result[i];
+            var found = false;
+            ret.forEach(element => {
+                if (element.StockName == trade.Stock) {
+                    element.Price += trade.Price;
+                    element.Counter += 1;
+                    element.Quantity += trade.Quantity;
+                    found = true;
+                }
+            });
+            if (!found) {
+                ret.push({ StockName: trade.Stock, Price: trade.Price, Quantity: trade.Quantity, Counter: 0 })
             }
         }
-
         res.send(ret);
     })
 })
 
 router.get("/holdings", utils.isLoggedIn, (req, res) => {
-    tradeModel.find({Portfolio : req.user.UUC }, (err, result) => {
-        if(err) {
+    var ret = []
+    var responseData = []
+    tradeModel.find({ Portfolio: req.user.UUC }, (err, result) => {
+        if (err) {
             res.send({
-                "Error" : "Unable to get the trades"
+                "Error": "Unable to get the trades"
             })
             return next();
         }
-        if(!result) {
+        if (!result) {
             res.send({
-                "Error" : "No trades found"
+                "Error": "No trades found"
             })
             return next();
         }
-//        res.send(result);
+
+        for (var i = 0; i < result.length; i++) {
+            var trade = result[i];
+            var found = false;
+
+            for(var x = 0; x < ret.length; x++) {
+                var element = ret[x];
+                if (element.StockName == trade.Stock) {
+                    if (trade.Type == "BUY") {
+                        element.Price += trade.Price;
+                        element.Counter += 1;
+                        element.Quantity += trade.Quantity;
+                    } else {
+                        element.Quantity -= trade.Quantity;
+                    }
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                ret.push({ StockName: trade.Stock, Price: trade.Price, Quantity: trade.Quantity, Counter: 1 })
+            }
+        }
+
+        ret.forEach(element => {
+            var Price = element.Price/ element.Counter;
+            responseData.push({"Name" : element.StockName, "Average Price" : Price, "Quantity" : element.Quantity });
+        })
+
+        res.send(responseData);
     })
 })
 

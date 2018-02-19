@@ -4,67 +4,55 @@ const stockModel = require("../stocks/stock_models").StockModel;
 const utils = require("../common/utils")
 
 router.post("/addTrade", utils.isLoggedIn, (req, res, next) => {
-    stockName = req.body.Stock;
-    stockModel.findOne({ name: stockName }, (err, result) => {
-        if(err) {
-            res.write(JSON.stringify({
-                "Error" : "Error while finding Stock"                
-            }));
+    stockModel.findOne({ Name: req.body.Stock }, (err, result) => {
+        if (err) {
+            res.send({ "Error": "Error while finding Stock" });
             return next();
         }
-        if(!result) {
-            res.write(JSON.stringify({
-                "Error" : "No Such Stock Found"
-            }));
+        if (!result) {
+            res.send({ "Error": "No Such Stock Found" });
             return next();
         }
         var trade = new tradeModel({
             Portfolio: req.user.UUC,
-            Stock: stockName,
+            Stock: req.body.Stock,
+            Quantity : req.body.Quantity,            
             Price: req.body.Price,
             Time: req.body.Time || Date.now(),
             Type: req.body.TradeType
         });
-        trade.save()
-        .then(() => {
+        trade.save().then(() => {
             res.send(JSON.stringify({
-                "Success" : "OK"
+                "Success": "OK"
+            }))
+        }).catch((err) => {
+            res.send(JSON.stringify({
+                "Error": err.code
             }))
         })
-        .catch((err) => {
-            res.send(JSON.stringify({
-                "Error" : err.code
-            }))
-        })
-        })
+    })
 })
 
 router.post("/updateTrade", utils.isLoggedIn, (req, res, next) => {
-    if(req.body.tradeId == undefined) {
-        res.send({
-            "Error" : "No Trade ID provided"
-        });
+    if (req.body.TradeId == undefined) {
+        res.send({ "Error": "No Trade ID provided" });
         return next();
     }
+
     tradeModel.findByIdAndUpdate(tradeId, {
         Portfolio: req.user.UUC,
         Stock: req.body.Stock,
         Time: req.body.Time || Date.now,
+        Quantity : req.body.Quantity,
         Price: req.body.Price,
         Type: req.body.TradeType
     }, (err, result) => {
-        if(err) {
-            res.write(JSON.stringify({
-                "Error" : "Error while updating Trade"                
-            }));
-            res.end();
+        if (err) {
+            res.send({ "Error": "Error while updating Trade" });
             return next();
         }
-        if(!result) {
-            res.write(JSON.stringify({
-                "Error" : "No Such Trade Found"
-            }));
-            res.end();
+        if (!result) {
+            res.write({ "Error": "No Such Trade Found" });
             return next();
         }
         res.send(result);
@@ -72,27 +60,23 @@ router.post("/updateTrade", utils.isLoggedIn, (req, res, next) => {
 })
 
 router.post("/removeTrade", utils.isLoggedIn, (req, res, next) => {
-    if(req.body.tradeId == undefined) {
-        res.send({
-            "Error" : "No Trade ID provided"
-        });
+    if (req.body.TradeId == undefined) {
+        res.send({ "Error": "No Trade ID provided" });
         return next();
     }
-    tradeModel.findByIdAndRemove(tradeId, (err, result) => {
-        if(err) {
-            res.write(JSON.stringify({
-                "Error" : "Error while removing Trade"                
-            }));
-            res.end();
+
+    tradeModel.findByIdAndRemove(req.body.TradeId, (err, result) => {
+        if (err) {
+            res.send({ "Error": "Error while removing Trade" });
             return next();
         }
-        if(!result) {
-            res.write(JSON.stringify({
-                "Error" : "No Such Trade Found"
-            }));
-            res.end();
+        if (!result) {
+            res.send({ "Error": "No Such Trade Found" });
             return next();
         }
+        res.send({
+            "Success" : "OK"
+        })
     })
 })
 

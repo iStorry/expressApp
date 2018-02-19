@@ -17,29 +17,39 @@ router.post("/addUser", (req, res, next) => {
     const randUUC = utils.randStr(6);
     const randPass = utils.randStr(10);
 
-    var newUser = new models.UserModel({
-        Email: email,
-        Password: randPass,
-        UUC: randUUC,
-        DaysToPasswordChange: 0
-    });
-    newUser.save()
-        .then(() => {
+    var query = models.UserModel.find({}).select('UUC -_id');
+
+    query.exec(function (err, result) {
+        if (err) return next(err);
+
+        // Checks for uniqueness of random string
+        while(result.includes(randUUC)) {
+            randUUC = utils.randStr(6);
+        }
+
+        var newUser = new models.UserModel({
+            Email: email,
+            Password: randPass,
+            UUC: randUUC,
+            DaysToPasswordChange: 0
+        });
+        newUser.save().then(() => {
             res.send({
                 "Status": "OK",
-                "Data" : {
+                "Data": {
                     "Email": email,
                     "UUC": randUUC,
                     "Password": randPass
                 }
             });
-        })
-        .catch((err) => {
+        }).catch((err) => {
             res.send({
                 "Status": "Error",
                 "Code": err.code
             });
         });
+    });
+
 })
 
 router.post("/changePassword", (req, res, next) => {
@@ -48,73 +58,59 @@ router.post("/changePassword", (req, res, next) => {
     var newPass = req.body.NewPassword;
     var confirmPass = req.body.ConfirmPassword;
 
-    if(newPass != confirmPass) {
+    if (newPass != confirmPass) {
         res.send({
-            "Error" : "New Password and Confirm Password do not match"
+            "Error": "New Password and Confirm Password do not match"
         });
-        next();
+        return next();
     }
 
-    if (utils.validateEmail(email) && utils.validatePassword()) {
-        models.UserModel.findOne({
-            Email: email
-        }, (err, user) => {
+    if (utils.validateEmail(email)) {
+        res.send({
+            "Error": "Email Validation Failed"
+        })
+        return next();
+    }
+    if (utils.validatePassword(newPass)) {
+        res.send({
+            "Error": "Password Validation Failed"
+        });
+        return next();
+    }
+
+    models.UserModel.findOne({ Email: email }, (err, user) => {
+
+        if (err) {
+            res.send({ "Error": err.code });
+            return next();
+        }
+        if (!user) {
+            res.send({ "Error": "Incorrect User" });
+            return next();
+        }
+        if (!user.validPassword(oldPass)) {
+            res.send({ "Error": "Incorrect Password" });
+            return next();
+        }
+
+        models.UserModel.update({ Email: email }, { Password: newPassword, DaysToPasswordChange: 15 }, (err, val) => {
             if (err) {
-                res.send({ "Error" : err.code });
-                next();
+                res.send({
+                    "Error": err.code
+                })
+                return next();
             }
-            if (!user) {
-                res.send({ "Error" : "Incorrect User" });
-                next();
+            if (!val) {
+                res.send({
+                    "Error": "Error while updating the password"
+                })
+                return next();
             }
-            if (user.Password == oldPass) {
-                models.UserModel.update({
-                    Email: email
-                }, {
-                        Password: newPassword,
-                        DaysToPasswordChange: 15
-                    }, (err, val) => {
-                        if (err) {
-                            res.write("Error while updating: " + err.code);
-                            res.end();
-                        }
-                    })
-            } else {
-                res.write("Error : Incorrect Password");
-                res.end();
-            }
-        });
-
-        var newUser = new models.UserModel({
-            Email: email,
-            Password: randPass,
-            UUC: randUUC,
-            DaysToPasswordChange: 0
-        });
-        newUser.save()
-            .then(() => {
-                res.write(JSON.stringify({
-                    "Status": "OK",
-                    "Email": email,
-                    "UUC": randUUC,
-                    "Password": randPass
-                }));
-                res.end();
+            res.send({
+                "Success": "OK"
             })
-            .catch((err) => {
-                res.write(JSON.stringify({
-                    "Status": "Error",
-                    "Code": err.code
-                }));
-                res.end();
-            });
-    } else {
-        res.write(JSON.stringify({
-            "Status": "Error",
-            "Error": "Doesn't Looks like an email"
-        }));
-        res.end();
-    }
+        })
+    });
 })
 
 module.exports = {

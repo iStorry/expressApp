@@ -9,6 +9,7 @@ var User = new db.mongoose.Schema({
     },
     Password: {
         type: String,
+        minlength: 6,
         required: true,
     },
     DaysToPasswordChange : {
@@ -18,7 +19,8 @@ var User = new db.mongoose.Schema({
     UUC: {
         type: String,
         required: true,
-        maxlength: 6,
+        unique: true,
+        minlength: 6,
         maxlength: 6
     }
 });

@@ -6,6 +6,10 @@ var Trade = new db.mongoose.Schema({
         type : String,
         required : 'portfolio required'
     },
+    Quantity : {
+        type : Number,
+        required : 'Quantity of trade requried'
+    },
     Stock : {
         type : String,
         required: 'stock required for which the trade has happened'
