@@ -1,8 +1,12 @@
 const app  = require('express')();
 const user = require("./users/user_api");
-const folio = require("./portfolio/portfolio_api")
-const trade = require("./trades/trade_api")
-const stocks = require("./stocks/stocks_api")
+const folio = require("./portfolio/portfolio_api");
+const trade = require("./trades/trade_api");
+const stocks = require("./stocks/stocks_api");
+const passport = require('passport');
+const localStrategy = require('passport-local').Strategy;
+
+require("./auth")(app, passport, localStrategy);
 
 app.use("/portfolio/", folio.router);
 app.use("/portfolio/", trade.router);

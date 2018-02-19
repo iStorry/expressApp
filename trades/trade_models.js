@@ -1,13 +1,13 @@
-var mongoose = require('mongoose');
-var Float = require('mongoose-float').loadType(mongoose, 2);
+const db = require('../common/db_connection')
+const Float = require('mongoose-float').loadType(db.mongoose, 2);
 
-var Trade = new mongoose.Schema({
-    Portfolio : {
-        type : mongoose.Schema.Types.ObjectId,
-        required: 'Portfolio required'
-    },
+var Trade = new db.mongoose.Schema({
+    // Portfolio : {
+    //     type : db.mongoose.Schema.Types.ObjectId,
+    //     required: 'Portfolio required'
+    // },
     Stock : {
-        type : mongoose.Schema.Types.ObjectId,
+        type : String,
         required: 'stock required for which the trade has happened'
     },
     Price: {
@@ -25,7 +25,7 @@ var Trade = new mongoose.Schema({
     }
 });
 
-const TradeModel = mongoose.model("Trade", Trade);
+const TradeModel = db.mongoose.model("Trade", Trade);
 
 module.exports = {
     TradeModel

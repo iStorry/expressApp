@@ -1,7 +1,6 @@
-var mongoose = require('mongoose');
-var Float = require('mongoose-float').loadType(mongoose, 2);
+const db = require('../common/db_connection')
 
-var User = new mongoose.Schema({
+var User = new db.mongoose.Schema({
     Email : {
         type: String,
         lowercase: true,
@@ -24,7 +23,11 @@ var User = new mongoose.Schema({
     }
 });
 
-const UserModel = mongoose.model("Users", User);
+User.methods.validPassword = function(pass, cb) {
+    return this.Password == pass;
+}
+
+const UserModel = db.mongoose.model("Users", User);
 
 module.exports = {
     UserModel

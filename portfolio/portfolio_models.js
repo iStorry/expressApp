@@ -1,12 +1,11 @@
-var mongoose = require('mongoose');
-const Float = require('mongoose-float').loadType(mongoose, 2);
+const db = require('../common/db_connection')
 
-var Portfolio = new mongoose.Schema({
+var Portfolio = new db.mongoose.Schema({
     PortofolioName: String,
     User: String
 })
 
-const PortfolioModel = mongoose.model("Portolio", Portfolio);
+const PortfolioModel = db.mongoose.model("Portolio", Portfolio);
 
 module.exports = {
     PortfolioModel

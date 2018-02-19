@@ -1,14 +1,13 @@
-var mongoose = require('mongoose');
-var Float = require('mongoose-float').loadType(mongoose, 2);
+const db = require('../common/db_connection')
 
-var Stock = new mongoose.Schema({
+var Stock = new db.mongoose.Schema({
     Name: {
         type : String,
         required: 'Name of stock required'
     }
 });
 
-const StockModel = mongoose.model("Stocks", Stock);
+const StockModel = db.mongoose.model("Stocks", Stock);
 
 module.exports = {
     StockModel,
