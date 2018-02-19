@@ -2,10 +2,10 @@ const db = require('../common/db_connection')
 const Float = require('mongoose-float').loadType(db.mongoose, 2);
 
 var Trade = new db.mongoose.Schema({
-    // Portfolio : {
-    //     type : db.mongoose.Schema.Types.ObjectId,
-    //     required: 'Portfolio required'
-    // },
+    Portfolio : {
+        type : String,
+        required : 'portfolio required'
+    },
     Stock : {
         type : String,
         required: 'stock required for which the trade has happened'

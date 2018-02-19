@@ -2,15 +2,16 @@ const router = require('express').Router();
 const models = require('./stock_models')
 const utils = require("../common/utils")
 
-router.post("/addStock", (req, res) => {
-    if(req.body.name == undefined || req.body.name == null) {
+router.post("/addStock", (req, res, next) => {
+    console.log(req.body);
+    if(req.body.Name == undefined || req.body.Name == null) {
         res.write(JSON.stringify({
             "Error" : "Empty stock name"
         }));
         res.end();
         return next();
     }
-    const stock = new models.StockModel({ Name: req.body.name });
+    const stock = new models.StockModel({ Name: req.body.Name });
     stock.save()
     .then(() => {
         res.write(JSON.stringify({
@@ -28,7 +29,7 @@ router.post("/addStock", (req, res) => {
     })
 })
 
-router.post("/removeStock", (req, res) => {
+router.post("/removeStock", (req, res, next) => {
     if(req.body.name == undefined || req.body.name == null) {
         res.write(JSON.stringify({
             "Error" : "Empty stock name"

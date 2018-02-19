@@ -13,6 +13,6 @@ app.use("/portfolio/", trade.router);
 app.use("/stocks/", stocks.router);
 app.use("/user/", user.router);
 
-app.listen(3000, function(){
+app.listen(3001, function(){
     console.log("listening 3000");
 })
