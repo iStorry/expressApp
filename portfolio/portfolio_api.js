@@ -62,13 +62,12 @@ router.get("/", utils.isLoggedIn, (req, res, next) => {
             promises.push(new Promise((resolve, reject) => {
                 stockModel.findOne({ Name: element.StockName }, (err, stock) => {
                     if (err) {
-                        res.send({ "Error": "Error while retriving stocks" });
-                        next();
+                        reject(err);
                     }
                     if (!stock) {
-                        res.send({ "Error": "Unable to read stock with name: " + element.StockName });
-                        next();
+                        reject(new Error("No such stock found"))
                     }
+
                     res.StockName = stock.Name;
                     res.CurrentPrice = stock.CurrentPrice;
                     res.Trades = element.Trades;
@@ -79,7 +78,10 @@ router.get("/", utils.isLoggedIn, (req, res, next) => {
 
         Promise.all(promises).then((values) => {
             res.send(values);
-        })
+        }).catch((err) => {
+            res.send({ "Error": err });
+            next();
+        });
     })
 })
 
@@ -172,6 +174,7 @@ router.get("/returns", utils.isLoggedIn, (req, res) => {
             return next();
         }
 
+        // Aggregates the trades
         for (var i = 0; i < result.length; i++) {
             var trade = result[i];
             var found = false;
@@ -202,29 +205,29 @@ router.get("/returns", utils.isLoggedIn, (req, res) => {
             }
         }
 
+        // Get Average price for each Stock
         ret.forEach(element => {
             var Price = element.Price / element.Counter;
             responseData.push({ "Name": element.StockName, "AveragePrice": Price, "Quantity": element.Quantity });
         })
 
+        // compare with the current price of stock and get profit/loss
         var promises = []
         responseData.forEach(element => {
             var res = {}
             promises.push(new Promise((resolve, reject) => {
                 stockModel.findOne({ Name: element.Name }, (err, stock) => {
                     if (err) {
-                        res.send({ "Error": "Error while retriving stocks" });
-                        next();
+                        reject(err);
                     }
                     if (!stock) {
-                        res.send({ "Error": "Unable to read stock with name: " + element.StockName });
-                        next();
+                        reject(new Error("No such stock found"))
                     }
 
                     res.Name = element.Name;
                     res.ProfitOrLossPerStock = stock.CurrentPrice - element.AveragePrice;
                     res.Quantity = element.Quantity;
-                    res.TotalProfitOrLoss =  res.ProfitOrLoss * res.Quantity;
+                    res.TotalProfitOrLoss = res.ProfitOrLoss * res.Quantity;
                     resolve(res);
                 });
             }));
@@ -232,11 +235,14 @@ router.get("/returns", utils.isLoggedIn, (req, res) => {
 
         Promise.all(promises).then((values) => {
             res.send(values);
-        })
+        }).catch((err) => {
+            res.send({ "Error": err });
+            next();
+        });
 
     })
 })
 
 module.exports = {
     router
-}  
+}
