@@ -3,19 +3,25 @@ const tradeModel = require("../trades/trade_models").TradeModel;
 const stockModel = require("../stocks/stock_models").StockModel;
 const utils = require("../common/utils")
 
+/*
+    Path : "/portfolio"
+    Method : Get
+    AuthenticationRequired : True
+    Params : None
+    SuccessResponse : [ Portfolio ]
+    FailureResponse : { "Error": "Unable to get the trades" } |
+                      { "Error": "No trades found" }          |
+    Description : Portfolio API
+*/
 router.get("/", utils.isLoggedIn, (req, res) => {
     var ret = [];
     tradeModel.find({ Portfolio: req.user.UUC }, (err, result) => {
         if (err) {
-            res.send({
-                "Error": "Unable to get the trades"
-            })
+            res.send({ "Error": "Unable to get the trades" })
             return next();
         }
         if (!result) {
-            res.send({
-                "Error": "No trades found"
-            })
+            res.send({ "Error": "No trades found" })
             return next();
         }
 
@@ -38,20 +44,26 @@ router.get("/", utils.isLoggedIn, (req, res) => {
     })
 })
 
+/*
+    Path : "/portfolio/holdings"
+    Method : Get
+    AuthenticationRequired : True
+    Params : None
+    SuccessResponse : [ Holdings ]
+    FailureResponse : { "Error": "Unable to get the trades" } |
+                      { "Error": "No trades found" }          |
+    Description : Holdings API
+*/
 router.get("/holdings", utils.isLoggedIn, (req, res) => {
     var ret = []
     var responseData = []
     tradeModel.find({ Portfolio: req.user.UUC }, (err, result) => {
         if (err) {
-            res.send({
-                "Error": "Unable to get the trades"
-            })
+            res.send({ "Error": "Unable to get the trades" })
             return next();
         }
         if (!result) {
-            res.send({
-                "Error": "No trades found"
-            })
+            res.send({ "Error": "No trades found" })
             return next();
         }
 
@@ -94,6 +106,7 @@ router.get("/holdings", utils.isLoggedIn, (req, res) => {
     })
 })
 
+// TODO
 router.get("/returns", utils.isLoggedIn, (req, res) => {
 
 })

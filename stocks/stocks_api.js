@@ -2,6 +2,15 @@ const router = require('express').Router();
 const models = require('./stock_models')
 const utils = require("../common/utils")
 
+/*
+    Path : "/stocks/addStock"
+    Method : Post
+    Params : { "Name" : String }
+    SuccessResponse : { "Success" : "OK" }
+    FailureResponse : {"Error": "Empty stock name"} |
+                      { "Error" : ErrorCode } 
+    Description : Add Stock API
+*/
 router.post("/addStock", (req, res, next) => {
 
     if (req.body.Name == undefined || req.body.Name == null) {
@@ -14,11 +23,21 @@ router.post("/addStock", (req, res, next) => {
         res.send({ "Success": "OK" });
         return next();
     }).catch((err) => {
-        res.send(JSON.stringify({ "Error": err.code }))
+        res.send({ "Error": err.code })
         return next();
     })
 })
 
+/*
+    Path : "stocks/removeStock/"
+    Method : Post
+    Params : { "Name" : String }
+    SuccessResponse : { "Success" : "OK" }
+    FailureResponse : {"Error": "Empty stock name"}      | 
+                      { "Error" : ErrorCode }            |
+                      { "Error": "No such Stock found" }
+    Description : Add Stock API
+*/
 router.post("/removeStock", (req, res, next) => {
     if (req.body.Name == undefined || req.body.Name == null) {
         res.send({ "Error": "Empty stock name" });
@@ -35,7 +54,7 @@ router.post("/removeStock", (req, res, next) => {
             return next();
         }
         res.send({
-            "Success" : "OK"
+            "Success": "OK"
         })
     })
 })

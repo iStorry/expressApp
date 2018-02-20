@@ -14,6 +14,7 @@ module.exports = function (app, passport, LocalStrategy) {
         saveUninitialized: true 
     }));
     
+    // Creating a new custom passport strategy to use our database to verify credentials.
     passport.use('local-login', new LocalStrategy(
         function (username, password, done) {
             userModel.findOne({ UUC: username }, function (err, user) {
@@ -42,17 +43,38 @@ module.exports = function (app, passport, LocalStrategy) {
     app.use(passport.initialize());
     app.use(passport.session());    
 
+    /*
+        Path : "/"
+        Method : Get
+        Params : None
+        Response : Hello Upstox!
+        Description : Just a method for testing
+    */
     app.get("/", function (req, res) {
         res.send("Hello UpStox!");
     });
      
-    app.post("/login", 
+    /*
+        Path : "/login"
+        Method : Post
+        Params : { "username" : "SomeUUC", "password" : "SomePassword" }
+        Response : "Authenticated User : SomeUUC"
+        Description : User login API
+    */
+   app.post("/login", 
         passport.authenticate("local-login", { failureRedirect: "/login"}),
         function (req, res) {
             res.send("Authenticated User :" + req.user.UUC);
     });
 
-    app.get("/logout", function (req, res) {
+    /*
+        Path : "/logout"
+        Method : Get
+        Params : None
+        Response : "logout success"
+        Description : User logout API
+    */
+   app.get("/logout", function (req, res) {
         req.logout();
         res.send("logout success!");
     });
