@@ -7,7 +7,7 @@ const passport = require('passport');
 const localStrategy = require('passport-local').Strategy;
 
 // Authentication Configuration
-require("./auth")(app, passport, localStrategy);
+require("./auth/auth")(app, passport, localStrategy);
 
 // Routes
 app.use("/portfolio/", folio.router);

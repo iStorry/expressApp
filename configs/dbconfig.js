@@ -1,0 +1,1 @@
+module.exports.Name = "stocks" // Database Name
