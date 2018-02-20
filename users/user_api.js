@@ -59,10 +59,7 @@ router.post("/addUser", (req, res, next) => {
                 }
             });
         }).catch((err) => {
-            res.send({
-                "Status": "Error",
-                "Code": err.code
-            });
+            res.send({ "Error": err });
         });
     });
 
@@ -78,7 +75,7 @@ router.post("/addUser", (req, res, next) => {
     SuccessResponse : { "Success" : "OK", UserData }
     FailureResponse : { "Error": "New Password and Confirm Password do not match" } |
                       { "Error": "Password Validation Failed" }                     | 
-                      { "Error": err.code }                                         |
+                      { "Error": error }                                            |
                       { "Error": "Incorrect User" }                                 |
                       { "Error": "Incorrect Password" }                             |
                       { "Error": "Incorrect Credentials" }
@@ -95,14 +92,14 @@ router.post("/changePassword", utils.isLoggedIn, (req, res, next) => {
         return next();
     }
 
-    if (utils.validatePassword(newPass)) {
+    if (!utils.validatePassword(newPass)) {
         res.send({ "Error": "Password Validation Failed" });
         return next();
     }
 
-    userModel.findOneAndUpdate({ UCC: ucc, Password: oldPass }, { Password: newPassword, DaysToPasswordChange: 15 }, (err, val) => {
+    userModel.findOneAndUpdate({ UUC: uuc, Password: oldPass }, { Password: newPass, DaysToPasswordChange: 15 }, (err, val) => {
         if (err) {
-            res.send({ "Error": err.code })
+            res.send({ "Error": err })
             return next();
         }
         if (!val) {

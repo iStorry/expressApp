@@ -40,7 +40,7 @@ router.post("/addTrade", utils.isLoggedIn, (req, res, next) => {
         trade.save().then(() => {
             res.send({ "Success": "OK" })
         }).catch((err) => {
-            res.send({ "Error": err.code })
+            res.send({ "Error": err })
         })
     })
 })
@@ -68,16 +68,16 @@ router.post("/updateTrade", utils.isLoggedIn, (req, res, next) => {
         return next();
     }
 
-    tradeModel.findByIdAndUpdate(tradeId, {
+    tradeModel.findByIdAndUpdate(req.body.TradeId, {
         Portfolio: req.user.UUC,
         Stock: req.body.Stock,
-        Time: req.body.Time || Date.now,
+        Time: req.body.Time || Date.now(),
         Quantity : req.body.Quantity,
         Price: req.body.Price,
         Type: req.body.TradeType
     }, (err, result) => {
         if (err) {
-            res.send({ "Error": "Error while updating Trade" });
+            res.send({ "Error": err });
             return next();
         }
         if (!result) {
@@ -107,7 +107,7 @@ router.post("/removeTrade", utils.isLoggedIn, (req, res, next) => {
 
     tradeModel.findByIdAndRemove(req.body.TradeId, (err, result) => {
         if (err) {
-            res.send({ "Error": "Error while removing Trade" });
+            res.send({ "Error": err });
             return next();
         }
         if (!result) {

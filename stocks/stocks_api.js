@@ -28,7 +28,7 @@ router.post("/addStock", (req, res, next) => {
         res.send({ "Success": "OK" });
         return next();
     }).catch((err) => {
-        res.send({ "Error": err.code })
+        res.send({ "Error": err })
         return next();
     })
 })
@@ -51,7 +51,7 @@ router.post("/removeStock", (req, res, next) => {
 
     models.StockModel.findOneAndRemove({ Name: req.body.Name }, (err, result) => {
         if (err) {
-            res.send({ "Error": err.code });
+            res.send({ "Error": err });
             return next();
         }
         if (!result) {

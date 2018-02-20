@@ -19,13 +19,17 @@ router.get("/", utils.isLoggedIn, (req, res, next) => {
 
     tradeModel.find({ Portfolio: req.user.UUC }, (err, result) => {
         if (err) {
-            res.send({ "Error": "Unable to get the trades" })
+            res.send({ "Error": err })
             return next();
         }
         if (!result) {
             res.send({ "Error": "No trades found" })
             return next();
         }
+
+        /*
+            This parses all the trades and groups into objects on the basis of stock Name.
+        */
 
         for (var i = 0; i < result.length; i++) {
             var trade = result[i];
@@ -56,6 +60,9 @@ router.get("/", utils.isLoggedIn, (req, res, next) => {
             }
         }
 
+        /*
+            We fetch additional details from the Stocks model here and merge it with the trades data. 
+        */
         var promises = []
         ret.forEach(element => {
             var res = {}
@@ -91,7 +98,7 @@ router.get("/", utils.isLoggedIn, (req, res, next) => {
     AuthenticationRequired : True
     Params : None
     SuccessResponse : [ Holdings ]
-    FailureResponse : { "Error": "Unable to get the trades" } |
+    FailureResponse : { "Error": error } |
                       { "Error": "No trades found" }          |
     Description : Holdings API
 */
@@ -100,13 +107,24 @@ router.get("/holdings", utils.isLoggedIn, (req, res) => {
     var responseData = []
     tradeModel.find({ Portfolio: req.user.UUC }, (err, result) => {
         if (err) {
-            res.send({ "Error": "Unable to get the trades" })
+            res.send({ "Error": err })
             return next();
         }
         if (!result) {
             res.send({ "Error": "No trades found" })
             return next();
         }
+
+        /*
+            if trade is buy, we add the price, increment the counter and
+            also add the quantity
+            if trade is sell, we just reduce the quantity.
+
+            The quantity value is the numbers of stocks we're holding.
+
+            we summed up all the prices and then divide it by the counter value
+            it will give us the average price.
+        */
 
         for (var i = 0; i < result.length; i++) {
             var trade = result[i];
@@ -127,6 +145,11 @@ router.get("/holdings", utils.isLoggedIn, (req, res) => {
                 }
             }
 
+            /*
+                Same as commented abbove. If buy, we add quantity
+                otherwise we substract the quantity
+            */
+
             if (!found) {
                 var qty = 0;
                 if (trade.Type == "BUY") {
@@ -138,6 +161,10 @@ router.get("/holdings", utils.isLoggedIn, (req, res) => {
             }
         }
 
+
+        /*
+            We calculate the average here by dividing the price by counter.
+        */
         ret.forEach(element => {
             var Price = element.Price / element.Counter;
             responseData.push({ "Name": element.StockName, "Average Price": Price, "Quantity": element.Quantity });
@@ -166,7 +193,7 @@ router.get("/returns", utils.isLoggedIn, (req, res) => {
     var responseData = []
     tradeModel.find({ Portfolio: req.user.UUC }, (err, result) => {
         if (err) {
-            res.send({ "Error": "Unable to get the trades" })
+            res.send({ "Error": err })
             return next();
         }
         if (!result) {
@@ -227,7 +254,7 @@ router.get("/returns", utils.isLoggedIn, (req, res) => {
                     res.Name = element.Name;
                     res.ProfitOrLossPerStock = stock.CurrentPrice - element.AveragePrice;
                     res.Quantity = element.Quantity;
-                    res.TotalProfitOrLoss = res.ProfitOrLoss * res.Quantity;
+                    res.TotalProfitOrLoss = res.ProfitOrLossPerStock * res.Quantity;
                     resolve(res);
                 });
             }));
