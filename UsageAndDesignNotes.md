@@ -151,9 +151,7 @@ Input:
 
 Output:
 ```JSON
-{
-    "Success": "OK"
-}
+{ "Success": "OK" }
 ```
 
 ### Portfolio
@@ -300,6 +298,16 @@ Output:
 ```JSON
 { "Success" : "OK" }
 ```
+
+## Authentication
+For Authentication, Passport JS is used. A new Strategy 'local-login' is created which ensures authentication based on UUC and password stored in database.
+
+## Additional libs used:
+* Passport for authentication
+* express-session for sessions
+* mongoose as mongodb driver
+* body-parser for parsing JSON
+
 
 ## Design Decisions:
 
