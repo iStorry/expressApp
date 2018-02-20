@@ -5,7 +5,8 @@ const utils = require("../common/utils")
 /*
     Path : "/stocks/addStock"
     Method : Post
-    Params : { "Name" : String }
+    Params : { "Name" : String,
+               "CurrentPrice", Float }
     SuccessResponse : { "Success" : "OK" }
     FailureResponse : {"Error": "Empty stock name"} |
                       { "Error" : ErrorCode } 
@@ -18,7 +19,11 @@ router.post("/addStock", (req, res, next) => {
         return next();
     }
 
-    const stock = new models.StockModel({ Name: req.body.Name });
+    const stock = new models.StockModel({
+        Name: req.body.Name,
+        CurrentPrice: req.body.CurrentPrice
+    });
+
     stock.save().then(() => {
         res.send({ "Success": "OK" });
         return next();

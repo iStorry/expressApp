@@ -2,8 +2,8 @@ module.exports = function (app, passport, LocalStrategy) {
 
     const bp = require('body-parser');
     const session = require("express-session");
-    const userModel = require("./users/user_models").UserModel;
-    const utils = require("./common/utils");
+    const userModel = require("../users/user_models").UserModel;
+    const utils = require("../common/utils");
 
     app.use(bp.urlencoded({ extended: true }));
     app.use(bp.json());
