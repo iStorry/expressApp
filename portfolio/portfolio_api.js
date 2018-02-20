@@ -75,7 +75,13 @@ router.get("/holdings", utils.isLoggedIn, (req, res) => {
             }
 
             if (!found) {
-                ret.push({ StockName: trade.Stock, Price: trade.Price, Quantity: trade.Quantity, Counter: 1 })
+                var qty = 0;
+                if(trade.Type == "BUY") {
+                    qty = trade.Quantity;
+                } else {
+                    qty = -trade.Quantity;
+                }
+                ret.push({ StockName: trade.Stock, Price: trade.Price, Quantity: qty, Counter: 1 })
             }
         }
 
