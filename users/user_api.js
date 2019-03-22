@@ -79,7 +79,7 @@ router.post("/addUser", (req, res, next) => {
                       { "Error": "Incorrect User" }                                 |
                       { "Error": "Incorrect Password" }                             |
                       { "Error": "Incorrect Credentials" }
-    Description : Change Usesr Password API
+    Description : Change User Password API
 */
 router.post("/changePassword", utils.isLoggedIn, (req, res, next) => {
     var uuc = req.user.UUC;
